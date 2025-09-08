@@ -1,103 +1,132 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle2, FileText, Gavel, Users } from "lucide-react";
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <main className="flex flex-col min-h-screen bg-white text-gray-900">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-blue-600 to-blue-800 text-white py-24">
+        <div className="container mx-auto px-6 text-center max-w-4xl">
+          <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+            Smart Legal Documents & Lawyer Access
+          </h1>
+          <p className="mt-6 text-lg md:text-xl text-blue-100">
+            Generate contracts in minutes, consult verified lawyers, and manage your legal needs — all in one place.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link href="/signup">
+              <Button size="lg" className="bg-white text-blue-700 cursor-pointer hover:bg-blue-100">
+                Get Started Free
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button size="lg" variant="outline" className="text-white cursor-pointer border-white bg-transparent hover:bg-blue-700">
+                Login
+              </Button>
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </section>
+
+      {/* Features */}
+      <section id="features" className="py-20 container mx-auto px-6">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Why Choose MobiDocs?</h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          <Card className="shadow-lg border border-gray-100">
+            <CardHeader>
+              <FileText className="w-10 h-10 text-blue-600" />
+              <CardTitle>Document Generator</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Create tenancy, freelance, and loan agreements in minutes with editable templates.</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-lg border border-gray-100">
+            <CardHeader>
+              <Gavel className="w-10 h-10 text-blue-600" />
+              <CardTitle>Lawyer on Demand</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Hire verified lawyers instantly for consultations and contract reviews.</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-lg border border-gray-100">
+            <CardHeader>
+              <Users className="w-10 h-10 text-blue-600" />
+              <CardTitle>Dual Accounts</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Separate dashboards for Clients & Lawyers, tailored to their needs.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Pricing Teaser */}
+      <section id="pricing" className="bg-gray-50 py-20">
+        <div className="container mx-auto px-6 max-w-4xl text-center">
+          <h2 className="text-3xl md:text-4xl font-bold">Flexible Plans for Everyone</h2>
+          <p className="mt-4 text-gray-600">
+            Start free and upgrade anytime. Choose a plan that fits your legal needs.
+          </p>
+          <div className="mt-8 grid md:grid-cols-2 gap-8">
+            <Card className="shadow-md">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold">Clients</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p><CheckCircle2 className="inline w-4 h-4 text-green-500 mr-2"/> 3 Free Templates</p>
+                <p><CheckCircle2 className="inline w-4 h-4 text-green-500 mr-2"/> Lawyer Directory</p>
+                <p><CheckCircle2 className="inline w-4 h-4 text-green-500 mr-2"/> Consultations</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-md">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold">Lawyers</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p><CheckCircle2 className="inline w-4 h-4 text-green-500 mr-2"/> Profile Boost</p>
+                <p><CheckCircle2 className="inline w-4 h-4 text-green-500 mr-2"/> Accept Bookings</p>
+                <p><CheckCircle2 className="inline w-4 h-4 text-green-500 mr-2"/> Paid Consultations</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section id="testimonials" className="py-20 container mx-auto px-6">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">What Our Users Say</h2>
+        <div className="grid md:grid-cols-2 gap-8">
+          <Card className="p-6 shadow-md">
+            <p className="text-gray-700 italic">
+              "Lawbridge helped me draft my tenancy agreement in minutes. Saved me time and money!"
+            </p>
+            <p className="mt-4 font-semibold">– Adebayo, Tenant</p>
+          </Card>
+          <Card className="p-6 shadow-md">
+            <p className="text-gray-700 italic">
+              "As a lawyer, I love how easy it is to get clients through MobiDocs."
+            </p>
+            <p className="mt-4 font-semibold">– Chidinma, Corporate Lawyer</p>
+          </Card>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="bg-blue-700 text-white py-16 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold">Ready to simplify your legal journey?</h2>
+        <p className="mt-4 text-blue-100">Join thousands of users and lawyers already using MobiDocs.</p>
+        <div className="mt-6">
+          <Link href="/signup">
+            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-100">
+              Get Started Free
+            </Button>
+          </Link>
+        </div>
+      </section>
+    </main>
   );
 }
