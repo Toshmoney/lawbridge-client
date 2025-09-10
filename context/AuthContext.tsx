@@ -50,12 +50,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(user);
     setToken(token);
     localStorage.setItem("token", token);
+    console.log("User logged in, token saved to localStorage", token);
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
     localStorage.removeItem("token");
+    return window.location.href = "/login";
   };
 
   return (

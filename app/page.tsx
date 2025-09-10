@@ -2,10 +2,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, FileText, Gavel, Users } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function LandingPage() {
   return (
+
     <main className="flex flex-col min-h-screen bg-white text-gray-900">
+      <Navbar />
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-600 to-blue-800 text-white py-24">
         <div className="container mx-auto px-6 text-center max-w-4xl">
@@ -32,7 +36,7 @@ export default function LandingPage() {
 
       {/* Features */}
       <section id="features" className="py-20 container mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Why Choose MobiDocs?</h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Why Choose Lawbridge?</h2>
         <div className="grid md:grid-cols-3 gap-8">
           <Card className="shadow-lg border border-gray-100">
             <CardHeader>
@@ -108,7 +112,7 @@ export default function LandingPage() {
           </Card>
           <Card className="p-6 shadow-md">
             <p className="text-gray-700 italic">
-              "As a lawyer, I love how easy it is to get clients through MobiDocs."
+              "As a lawyer, I love how easy it is to get clients through Lawbridge."
             </p>
             <p className="mt-4 font-semibold">– Chidinma, Corporate Lawyer</p>
           </Card>
@@ -118,7 +122,7 @@ export default function LandingPage() {
       {/* Call to Action */}
       <section className="bg-blue-700 text-white py-16 text-center">
         <h2 className="text-3xl md:text-4xl font-bold">Ready to simplify your legal journey?</h2>
-        <p className="mt-4 text-blue-100">Join thousands of users and lawyers already using MobiDocs.</p>
+        <p className="mt-4 text-blue-100">Join thousands of users and lawyers already using Lawbridge.</p>
         <div className="mt-6">
           <Link href="/signup">
             <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-100">
@@ -127,6 +131,7 @@ export default function LandingPage() {
           </Link>
         </div>
       </section>
+      <Footer />
     </main>
   );
 }

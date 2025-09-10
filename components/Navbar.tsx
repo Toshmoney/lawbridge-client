@@ -10,8 +10,12 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useAuth } from "@/context/AuthContext";
+
 
 export default function Navbar() {
+  const { user } = useAuth();
+
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
@@ -72,7 +76,12 @@ export default function Navbar() {
 
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex gap-3">
-          <Link href="/login">
+          {user ? (
+            <Link href="/dashboard">
+              <Button className="cursor-pointer">Dashboard</Button>
+            </Link>
+          ) : (
+            <><Link href="/login">
             <Button
               variant={scrolled ? "outline" : "secondary"}
               className={scrolled ? "" : "bg-white text-blue-700 cursor-pointer hover:bg-gray-100"}
@@ -87,6 +96,8 @@ export default function Navbar() {
               Sign Up
             </Button>
           </Link>
+          </>
+          )}
         </div>
 
         {/* Mobile Menu */}
@@ -112,7 +123,13 @@ export default function Navbar() {
                 ))}
               </ul>
               <div className="flex flex-col gap-3">
-                <Link href="/login">
+                {user ? (
+                  <Link href="/dashboard">
+                    <Button className="w-full cursor-pointer">Dashboard</Button>
+                  </Link>
+                ) : (
+                  <>
+                  <Link href="/login">
                   <Button variant="outline" className="w-full cursor-pointer">
                     Login
                   </Button>
@@ -120,6 +137,8 @@ export default function Navbar() {
                 <Link href="/signup">
                   <Button className="w-full cursor-pointer">Sign Up</Button>
                 </Link>
+                  </>
+                )}
               </div>
             </SheetContent>
           </Sheet>

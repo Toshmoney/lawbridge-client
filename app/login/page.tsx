@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { apiClient } from "@/lib/apiClient";
 import { useToast } from "@/components/ui/use-toast";
 import { Eye, EyeOff } from "lucide-react";
-import { useAuth } from "@/context/AuthContext"; // ✅ import auth
+import { useAuth } from "@/context/AuthContext";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -24,22 +24,20 @@ export default function LoginPage() {
   });
 
   const { addToast } = useToast();
-  const { login } = useAuth(); // ✅ get login from context
+  const { login } = useAuth();
 
   const onSubmit = async (data: any) => {
     setLoading(true);
 
     try {
-      const result = await apiClient<{ token: string; user: any }>(
+      const result = await apiClient<{ accessToken: string; user: any }>(
         "/auth/login",
         {
           method: "POST",
           body: JSON.stringify(data),
         }
       );
-
-      // ✅ use context login
-      login(result.user, result.token);
+      login(result.user, result.accessToken);
 
       addToast({
         title: "Login Successful 🎉",
