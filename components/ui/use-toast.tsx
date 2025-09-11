@@ -25,7 +25,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const addToast = (toast: Omit<ToastMessage, "id">) => {
     idCounter++;
     setToasts((prev) => [...prev, { id: idCounter, ...toast }]);
-    setTimeout(() => removeToast(idCounter), 4000); // auto dismiss
+    setTimeout(() => removeToast(idCounter), 4000);
   };
 
   const removeToast = (id: number) =>
@@ -34,7 +34,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
       {children}
-      <div className="fixed bottom-4 right-4 space-y-2 z-[1000]">
+      <div className="fixed top-4 right-4 space-y-2 z-[1000]">
         {toasts.map((t) => (
           <div
             key={t.id}

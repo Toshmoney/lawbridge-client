@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useState, useEffect } from "react";
 
-type User = { id: string; name: string; email: string } | null;
+type User = { id: string; name: string; email: string, role: string } | null;
 
 interface AuthContextType {
   user: User;
@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(result.user);
       } else {
         console.error("Failed to fetch user info:", result.error);
-        logout(); // auto logout on error
+        logout(); 
       }
     } catch (error) {
       console.error("Error fetching user info:", error);

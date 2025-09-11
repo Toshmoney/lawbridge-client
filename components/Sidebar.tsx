@@ -40,6 +40,8 @@ export default function Sidebar() {
 function SidebarNav() {
   const pathname = usePathname();
   const { logout } = useAuth();
+  const { user } = useAuth();
+  
 
   const handleLogout = () => {
     logout();
@@ -64,18 +66,22 @@ function SidebarNav() {
         >
           <FileText size={18} /> Documents
         </Link>
-        <Link
-          href="/dashboard/lawyers"
-          className={linkClasses("/dashboard/lawyers")}
-        >
-          <Users size={18} /> Lawyers
-        </Link>
-        <Link
+
+        {
+          user?.role === "client"?
+          (<Link
+            href="/dashboard/lawyers"
+            className={linkClasses("/dashboard/lawyers")}
+          >
+            <Users size={18} /> Lawyers
+          </Link>): (<Link
           href="/dashboard/wallet"
           className={linkClasses("/dashboard/wallet")}
         >
           <Wallet size={18} /> Wallet
-        </Link>
+        </Link>)
+        }
+        
         <Link
           href="/dashboard/profile"
           className={linkClasses("/dashboard/profile")}
@@ -85,7 +91,7 @@ function SidebarNav() {
       </nav>
 
       {/* Log out */}
-      <div className="mt-auto border-t">
+      <div className="">
         <button
           className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 text-red-600 font-medium"
           onClick={handleLogout}

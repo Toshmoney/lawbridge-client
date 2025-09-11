@@ -13,7 +13,7 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-600 to-blue-800 text-white py-24">
         <div className="container mx-auto px-6 text-center max-w-4xl">
-          <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+          <h1 className="text-3xl md:text-6xl font-bold leading-tight">
             Smart Legal Documents & Lawyer Access
           </h1>
           <p className="mt-6 text-lg md:text-xl text-blue-100">
@@ -26,7 +26,7 @@ export default function LandingPage() {
               </Button>
             </Link>
             <Link href="/login">
-              <Button size="lg" variant="outline" className="text-white cursor-pointer border-white bg-transparent hover:bg-blue-700">
+              <Button size="lg" variant="outline" className="text-white cursor-pointer border-white bg-transparent hover:border-black hover:bg-black hover:text-white">
                 Login
               </Button>
             </Link>
@@ -125,7 +125,7 @@ export default function LandingPage() {
         <p className="mt-4 text-blue-100">Join thousands of users and lawyers already using Lawbridge.</p>
         <div className="mt-6">
           <Link href="/signup">
-            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-100">
+            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-100 cursor-pointer">
               Get Started Free
             </Button>
           </Link>

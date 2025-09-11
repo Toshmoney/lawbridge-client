@@ -34,7 +34,7 @@ export default function Footer() {
         {/* Contact */}
         <div>
           <h4 className="font-semibold mb-3">Contact Us</h4>
-          <p className="text-gray-600">📧 support@lawbridge.com.ng</p>
+          <p className="text-gray-600">📧 Lawbridgehelp@gmail.com</p>
           <p className="text-gray-600">📞 +234 9051 4788 80</p>
         </div>
       </div>

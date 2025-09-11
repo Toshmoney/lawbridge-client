@@ -93,15 +93,19 @@ export default function LoginPage() {
           </p>
         )}
 
+        <div className="text-sm text-center mt-1">
+          <a href="/forgot-password" className="text-blue-600 hover:underline">
+            Forgot Password?
+          </a>
+        </div>
+
         {/* Submit */}
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full cursor-pointer" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </Button>
 
         <div className="text-sm text-center mt-2">
-          <a href="/forgot-password" className="text-blue-600 hover:underline">
-            Forgot Password?
-          </a>
+          Don't have an account? <a href="/signup" className="text-blue-600 hover:underline">Sign Up</a>
         </div>
       </form>
     </div>
