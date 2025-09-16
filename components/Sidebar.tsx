@@ -61,8 +61,8 @@ function SidebarNav() {
           <Home size={18} /> Dashboard
         </Link>
         <Link
-          href="/dashboard/documents"
-          className={linkClasses("/dashboard/documents")}
+          href="/dashboard/document"
+          className={linkClasses("/dashboard/document")}
         >
           <FileText size={18} /> Documents
         </Link>
