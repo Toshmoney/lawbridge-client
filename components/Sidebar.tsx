@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, FileText, Users, Wallet, User, Menu } from "lucide-react";
+import { Home, FileText, Users, Wallet, Book, User, Menu, BookCopy  } from "lucide-react";
 import Link from "next/link";
 import {
   Sheet,
@@ -74,13 +74,31 @@ function SidebarNav() {
             className={linkClasses("/dashboard/lawyers")}
           >
             <Users size={18} /> Lawyers
-          </Link>): (<Link
-          href="/dashboard/wallet"
-          className={linkClasses("/dashboard/wallet")}
-        >
-          <Wallet size={18} /> Wallet
-        </Link>)
+          </Link>): (
+          <>
+              <Link
+                href="/dashboard/bookings"
+                className={linkClasses("/dashboard/bookings")}
+              >
+                <Book size={18} /> Bookings
+              </Link>
+              <Link
+                href="/dashboard/wallet"
+                className={linkClasses("/dashboard/wallet")}
+              >
+                <Wallet size={18} /> Wallet
+              </Link>
+          </>
+        
+      )
         }
+
+        <Link
+          href="/dashboard/templates"
+          className={linkClasses("/dashboard/templates")}
+        >
+          <BookCopy size={18} /> Templates
+        </Link>
         
         <Link
           href="/dashboard/profile"

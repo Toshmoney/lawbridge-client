@@ -14,6 +14,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 const templates: Record<
   string,
@@ -53,6 +54,10 @@ export default function DocumentsPage() {
   const [newTemplate, setNewTemplate] = useState("tenancy");
   const [fields, setFields] = useState<Record<string, string>>({});
   const [creating, setCreating] = useState(false);
+
+//   download doc
+const [downloadingPdfId, setDownloadingPdfId] = useState<string | null>(null);
+const [downloadingWordId, setDownloadingWordId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDocs = async () => {
@@ -134,6 +139,67 @@ export default function DocumentsPage() {
     
     }
   };
+
+//   handle file download
+const handleFileDownload = async (
+  fileType: "pdf" | "word",
+  fileId: string
+) => {
+  if (fileType === "pdf") {
+    setDownloadingPdfId(fileId);
+  } else {
+    setDownloadingWordId(fileId);
+  }
+
+  const path = fileType === "pdf" ? "download-pdf" : "download-word";
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/documents/${path}/${fileId}`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Failed to download");
+    }
+
+    // 🔹 Get binary file
+    const blob = await res.blob();
+
+    // 🔹 Extract filename
+    const contentDisposition = res.headers.get("Content-Disposition");
+    let fileName = `${fileId}.${fileType === "pdf" ? "pdf" : "docx"}`;
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="?(.+)"?/);
+      if (match?.[1]) fileName = match[1];
+    }
+
+    // 🔹 Trigger download
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    addToast({ title: "File downloaded successfully!" });
+  } catch (error: any) {
+    addToast({
+      title: "Download Failed ❌",
+      description: error.message,
+      variant: "destructive",
+    });
+  } finally {
+    fileType === "pdf" ? setDownloadingPdfId(null) : setDownloadingWordId(null);
+  }
+};
+
 
   const filteredDocs = documents.filter((doc) =>
     doc.title.toLowerCase().includes(search.toLowerCase())
@@ -245,6 +311,7 @@ export default function DocumentsPage() {
               <th className="p-4">Document Type</th>
               <th className="p-4">Date created</th>
               <th className="p-4">Status</th>
+              <th className="p-4">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -267,6 +334,43 @@ export default function DocumentsPage() {
                     })}
                   </td>
                   <td className="p-4">{renderStatus(doc.status)}</td>
+                  <td className="p-4 flex flex-col gap-2">
+                    
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleFileDownload("pdf", doc._id)}
+                            disabled={downloadingPdfId === doc._id}
+                            className="flex items-center gap-2"
+                        >
+                            {downloadingPdfId === doc._id ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" /> Downloading...
+                            </>
+                            ) : (
+                            "Download PDF"
+                            )}
+                        </Button>
+
+                        {/* Word Download */}
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleFileDownload("word", doc._id)}
+                            disabled={downloadingWordId === doc._id}
+                            className="flex items-center gap-2"
+                        >
+                            {downloadingWordId === doc._id ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" /> Downloading...
+                            </>
+                            ) : (
+                            "Download Word"
+                            )}
+                        </Button>
+
+                    </td>
+
                 </tr>
               ))
             ) : (
