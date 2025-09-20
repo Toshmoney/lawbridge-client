@@ -16,7 +16,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 
-const templates: Record<
+const systemTemplates: Record<
   string,
   { title: string; fields: string[] }
 > = {
@@ -34,6 +34,14 @@ const templates: Record<
   },
 };
 
+type CustomTemplate = {
+  _id: string;
+  title: string;
+  fields: string[];
+  content: string;
+  visibility: "private" | "public";
+};
+
 type Document = {
   _id: string;
   title: string;
@@ -44,21 +52,26 @@ type Document = {
 
 export default function DocumentsPage() {
   const { token } = useAuth();
+  const { addToast } = useToast();
+
   const [search, setSearch] = useState("");
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
-  const { addToast } = useToast();
 
-  // new doc form
+  // new doc state
   const [newTitle, setNewTitle] = useState("");
+  const [mode, setMode] = useState<"system" | "custom">("system");
   const [newTemplate, setNewTemplate] = useState("tenancy");
+  const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([]);
+  const [selectedCustom, setSelectedCustom] = useState<string>("");
   const [fields, setFields] = useState<Record<string, string>>({});
   const [creating, setCreating] = useState(false);
 
-//   download doc
-const [downloadingPdfId, setDownloadingPdfId] = useState<string | null>(null);
-const [downloadingWordId, setDownloadingWordId] = useState<string | null>(null);
+  // downloads
+  const [downloadingPdfId, setDownloadingPdfId] = useState<string | null>(null);
+  const [downloadingWordId, setDownloadingWordId] = useState<string | null>(null);
 
+  // fetch documents
   useEffect(() => {
     const fetchDocs = async () => {
       if (!token) return;
@@ -77,44 +90,86 @@ const [downloadingWordId, setDownloadingWordId] = useState<string | null>(null);
     fetchDocs();
   }, [token]);
 
-  // When template changes, reset fields
+  // fetch custom templates
   useEffect(() => {
-    if (newTemplate && templates[newTemplate]) {
+    if (!token) return;
+    const fetchCustom = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/custom-templates`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (res.ok) setCustomTemplates(data);
+      } catch (err) {
+        console.error("Error fetching custom templates:", err);
+      }
+    };
+    fetchCustom();
+  }, [token]);
+
+  // reset fields when template changes
+  useEffect(() => {
+    if (mode === "system" && systemTemplates[newTemplate]) {
       const init: Record<string, string> = {};
-      templates[newTemplate].fields.forEach((f) => (init[f] = ""));
+      systemTemplates[newTemplate].fields.forEach((f) => (init[f] = ""));
       setFields(init);
     }
-  }, [newTemplate]);
+    if (mode === "custom" && selectedCustom) {
+      const template = customTemplates.find((t) => t._id === selectedCustom);
+      if (template) {
+        const init: Record<string, string> = {};
+        template.fields.forEach((f) => (init[f] = ""));
+        setFields(init);
+      }
+    }
+  }, [mode, newTemplate, selectedCustom, customTemplates]);
 
   const handleFieldChange = (key: string, value: string) => {
     setFields((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleCreate = async () => {
-    if (!newTitle.trim()) return addToast({ title: "Title is required", variant: "destructive" });
+    if (!newTitle.trim()) {
+      return addToast({ title: "Title is required", variant: "destructive" });
+    }
+    if (!token) {
+      return addToast({ title: "Authentication required", variant: "destructive" });
+    }
 
-    // check all fields are filled
-    for (const field of templates[newTemplate].fields) {
+    // validate fields
+    const templateFields =
+      mode === "system"
+        ? systemTemplates[newTemplate].fields
+        : customTemplates.find((t) => t._id === selectedCustom)?.fields || [];
+
+    for (const field of templateFields) {
       if (!fields[field]?.trim()) {
         return addToast({ title: `Field "${field}" is required`, variant: "destructive" });
       }
     }
 
-    if (!token) return addToast({ title: "Authentication required", variant: "destructive" });
-
     setCreating(true);
     try {
+      const body: any = {
+        title: newTitle,
+        fields,
+        templateMode: mode,
+      };
+
+      if (mode === "system") {
+        body.templateType = newTemplate;
+      } else {
+        // body.templateType = selectedCustom; 
+        body.customTemplateId = selectedCustom;
+      }
+
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          title: newTitle,
-          templateType: newTemplate,
-          fields,
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
@@ -125,10 +180,13 @@ const [downloadingWordId, setDownloadingWordId] = useState<string | null>(null);
         addToast({ title: "Document created successfully" });
       } else {
         if (res.status === 401) {
-            addToast({title:"session expired pls login to continue"})
-            return window.location.href = "/login";
-        }else{
-            return addToast({ title: data.error || "Failed to create document", variant: "destructive" }); 
+          addToast({ title: "Session expired. Please log in." });
+          return (window.location.href = "/login");
+        } else {
+          return addToast({
+            title: data.message || "Failed to create document",
+            variant: "destructive",
+          });
         }
       }
     } catch (err) {
@@ -136,70 +194,55 @@ const [downloadingWordId, setDownloadingWordId] = useState<string | null>(null);
       addToast({ title: "Network error", variant: "destructive" });
     } finally {
       setCreating(false);
-    
     }
   };
 
-//   handle file download
-const handleFileDownload = async (
-  fileType: "pdf" | "word",
-  fileId: string
-) => {
-  if (fileType === "pdf") {
-    setDownloadingPdfId(fileId);
-  } else {
-    setDownloadingWordId(fileId);
-  }
+  // download file
+  const handleFileDownload = async (fileType: "pdf" | "word", fileId: string) => {
+    if (fileType === "pdf") setDownloadingPdfId(fileId);
+    else setDownloadingWordId(fileId);
 
-  const path = fileType === "pdf" ? "download-pdf" : "download-word";
+    const path = fileType === "pdf" ? "download-pdf" : "download-word";
 
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/documents/${path}/${fileId}`,
-      {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/${path}/${fileId}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Failed to download");
       }
-    );
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || "Failed to download");
+      const blob = await res.blob();
+      const contentDisposition = res.headers.get("Content-Disposition");
+      let fileName = `${fileId}.${fileType === "pdf" ? "pdf" : "docx"}`;
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?(.+)"?/);
+        if (match?.[1]) fileName = match[1];
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      addToast({ title: "File downloaded successfully!" });
+    } catch (error: any) {
+      addToast({
+        title: "Download Failed ❌",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      fileType === "pdf" ? setDownloadingPdfId(null) : setDownloadingWordId(null);
     }
-
-    // 🔹 Get binary file
-    const blob = await res.blob();
-
-    // 🔹 Extract filename
-    const contentDisposition = res.headers.get("Content-Disposition");
-    let fileName = `${fileId}.${fileType === "pdf" ? "pdf" : "docx"}`;
-    if (contentDisposition) {
-      const match = contentDisposition.match(/filename="?(.+)"?/);
-      if (match?.[1]) fileName = match[1];
-    }
-
-    // 🔹 Trigger download
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
-
-    addToast({ title: "File downloaded successfully!" });
-  } catch (error: any) {
-    addToast({
-      title: "Download Failed ❌",
-      description: error.message,
-      variant: "destructive",
-    });
-  } finally {
-    fileType === "pdf" ? setDownloadingPdfId(null) : setDownloadingWordId(null);
-  }
-};
-
+  };
 
   const filteredDocs = documents.filter((doc) =>
     doc.title.toLowerCase().includes(search.toLowerCase())
@@ -245,7 +288,7 @@ const handleFileDownload = async (
           {/* New Document Popup */}
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="whitespace-nowrap">New Document</Button>
+              <Button className="whitespace-nowrap cursor-pointer">New Document</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
               <DialogHeader>
@@ -260,40 +303,83 @@ const handleFileDownload = async (
                     onChange={(e) => setNewTitle(e.target.value)}
                   />
                 </div>
+
+                {/* Mode Switch */}
                 <div>
-                  <Label>Template Type</Label>
+                  <Label>Choose Template Source</Label>
                   <select
-                    value={newTemplate}
-                    onChange={(e) => setNewTemplate(e.target.value)}
+                    value={mode}
+                    onChange={(e) => setMode(e.target.value as "system" | "custom")}
                     className="w-full border rounded-lg p-2"
                   >
-                    {Object.keys(templates).map((key) => (
-                      <option key={key} value={key}>
-                        {templates[key].title}
-                      </option>
-                    ))}
+                    <option value="system">System Templates</option>
+                    <option value="custom">Custom Templates</option>
                   </select>
                 </div>
 
-                {/* Dynamic fields */}
-                {templates[newTemplate]?.fields.map((field) => (
-                  <div key={field}>
-                    <Label className="capitalize">{field}</Label>
-                    <Input
-                      placeholder={`Enter ${field}`}
-                      value={fields[field] || ""}
-                      onChange={(e) =>
-                        handleFieldChange(field, e.target.value)
-                      }
-                    />
+                {/* Template selection */}
+                {mode === "system" ? (
+                  <div>
+                    <Label>System Template</Label>
+                    <select
+                      value={newTemplate}
+                      onChange={(e) => setNewTemplate(e.target.value)}
+                      className="w-full border rounded-lg p-2"
+                    >
+                      {Object.keys(systemTemplates).map((key) => (
+                        <option key={key} value={key}>
+                          {systemTemplates[key].title}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                ))}
+                ) : (
+                  <div>
+                    <Label>Custom Template</Label>
+                    <select
+                      value={selectedCustom}
+                      onChange={(e) => setSelectedCustom(e.target.value)}
+                      className="w-full border rounded-lg p-2"
+                    >
+                      <option value="">-- Select Custom Template --</option>
+                      {customTemplates.map((t) => (
+                        <option key={t._id} value={t._id}>
+                          {t.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
-                <Button
-                  onClick={handleCreate}
-                  disabled={creating}
-                  className="w-full"
-                >
+                {/* Dynamic fields */}
+                {mode === "system" &&
+                  systemTemplates[newTemplate]?.fields.map((field) => (
+                    <div key={field}>
+                      <Label className="capitalize">{field}</Label>
+                      <Input
+                        placeholder={`Enter ${field}`}
+                        value={fields[field] || ""}
+                        onChange={(e) => handleFieldChange(field, e.target.value)}
+                      />
+                    </div>
+                  ))}
+
+                {mode === "custom" &&
+                  selectedCustom &&
+                  customTemplates
+                    .find((t) => t._id === selectedCustom)
+                    ?.fields.map((field) => (
+                      <div key={field}>
+                        <Label className="capitalize">{field}</Label>
+                        <Input
+                          placeholder={`Enter ${field}`}
+                          value={fields[field] || ""}
+                          onChange={(e) => handleFieldChange(field, e.target.value)}
+                        />
+                      </div>
+                    ))}
+
+                <Button onClick={handleCreate} disabled={creating} className="w-full">
                   {creating ? "Creating..." : "Create Document"}
                 </Button>
               </div>
@@ -317,7 +403,7 @@ const handleFileDownload = async (
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={4} className="p-6 text-center text-gray-500">
+                <td colSpan={5} className="p-6 text-center text-gray-500">
                   Loading documents...
                 </td>
               </tr>
@@ -325,7 +411,9 @@ const handleFileDownload = async (
               filteredDocs.map((doc) => (
                 <tr key={doc._id} className="border-t">
                   <td className="p-4">{doc.title}</td>
-                  <td className="p-4">{doc.templateType.toUpperCase()}</td>
+                  <td className="p-4">
+                    {doc.templateType?.toUpperCase() || "CUSTOM"}
+                  </td>
                   <td className="p-4">
                     {new Date(doc.createdAt).toLocaleDateString("en-US", {
                       month: "short",
@@ -335,47 +423,43 @@ const handleFileDownload = async (
                   </td>
                   <td className="p-4">{renderStatus(doc.status)}</td>
                   <td className="p-4 flex flex-col gap-2">
-                    
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleFileDownload("pdf", doc._id)}
-                            disabled={downloadingPdfId === doc._id}
-                            className="flex items-center gap-2"
-                        >
-                            {downloadingPdfId === doc._id ? (
-                            <>
-                                <Loader2 className="w-4 h-4 animate-spin" /> Downloading...
-                            </>
-                            ) : (
-                            "Download PDF"
-                            )}
-                        </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleFileDownload("pdf", doc._id)}
+                      disabled={downloadingPdfId === doc._id}
+                      className="flex items-center gap-2"
+                    >
+                      {downloadingPdfId === doc._id ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" /> Downloading...
+                        </>
+                      ) : (
+                        "Download PDF"
+                      )}
+                    </Button>
 
-                        {/* Word Download */}
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleFileDownload("word", doc._id)}
-                            disabled={downloadingWordId === doc._id}
-                            className="flex items-center gap-2"
-                        >
-                            {downloadingWordId === doc._id ? (
-                            <>
-                                <Loader2 className="w-4 h-4 animate-spin" /> Downloading...
-                            </>
-                            ) : (
-                            "Download Word"
-                            )}
-                        </Button>
-
-                    </td>
-
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleFileDownload("word", doc._id)}
+                      disabled={downloadingWordId === doc._id}
+                      className="flex items-center gap-2"
+                    >
+                      {downloadingWordId === doc._id ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" /> Downloading...
+                        </>
+                      ) : (
+                        "Download Word"
+                      )}
+                    </Button>
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="p-6 text-center text-gray-500">
+                <td colSpan={5} className="p-6 text-center text-gray-500">
                   No documents found
                 </td>
               </tr>

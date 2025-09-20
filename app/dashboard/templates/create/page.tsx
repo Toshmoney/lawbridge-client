@@ -18,6 +18,7 @@ export default function CreateTemplatePage() {
   const [content, setContent] = useState("");
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [loading, setLoading] = useState(false);
+  const [templateType, setTemplateType] = useState("");
 
   const addField = () => {
     if (fieldInput.trim() && !fields.includes(fieldInput.trim())) {
@@ -37,7 +38,7 @@ export default function CreateTemplatePage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, fields, content, visibility }),
+        body: JSON.stringify({ title, fields, content, visibility, templateType }),
       });
 
       const data = await res.json();
@@ -110,6 +111,17 @@ export default function CreateTemplatePage() {
             required
           />
         </div>
+        {/* templateType */}
+         <div>
+          <Label htmlFor="templateType">Template Type</Label>
+          <Input
+            id="templateType"
+            placeholder="e.g. NDA, Contract"
+            value={templateType}
+            onChange={(e) => setTemplateType(e.target.value)}
+            required
+          />
+         </div>
 
         {/* Visibility */}
         <div>
