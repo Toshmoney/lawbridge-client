@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -17,13 +17,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Lawbridge - Smart Legal Documents & Lawyer Access",
-  description: "Generate contracts in minutes, consult verified lawyers, and manage your legal needs — all in one place.",
+  description:
+    "Generate contracts in minutes, consult verified lawyers, and manage your legal needs — all in one place.",
   icons: {
     icon: "/favicon.ico",
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
   },
   keywords: [
     "legal documents",
@@ -40,7 +37,8 @@ export const metadata: Metadata = {
   authors: [{ name: "Lawbridge", url: "https://lawbridge.com.ng" }],
   openGraph: {
     title: "Lawbridge - Smart Legal Documents & Lawyer Access",
-    description: "Generate contracts in minutes, consult verified lawyers, and manage your legal needs — all in one place.",
+    description:
+      "Generate contracts in minutes, consult verified lawyers, and manage your legal needs — all in one place.",
     url: "https://lawbridge.com.ng",
     siteName: "Lawbridge",
     images: [
@@ -57,17 +55,24 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Lawbridge - Smart Legal Documents & Lawyer Access",
-    description: "Generate contracts in minutes, consult verified lawyers, and manage your legal needs — all in one place.",
+    description:
+      "Generate contracts in minutes, consult verified lawyers, and manage your legal needs — all in one place.",
     images: ["https://lawbridge.com.ng/og-image.png"],
     creator: "@lawbridge",
   },
 };
 
+// ✅ Move viewport outside of metadata
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body

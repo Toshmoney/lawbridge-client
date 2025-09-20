@@ -1,10 +1,26 @@
 "use client";
 import { createContext, useContext, useState, useEffect } from "react";
 
-type User = { id: string; name: string; email: string, role: string } | null;
+type Subscription = {
+  plan: string
+  expiresAt?: string
+}
+
+type User = {
+  id?: string
+  name: string
+  email: string
+  role: string
+  createdAt?: string
+  subscription?: {
+    plan: string
+    expiresAt?: string
+  }
+}
+
 
 interface AuthContextType {
-  user: User;
+  user: User | null;
   token: string | null;
   login: (user: User, token: string) => void;
   logout: () => void;
@@ -13,7 +29,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
   const getUserInfo = async (token: string) => {

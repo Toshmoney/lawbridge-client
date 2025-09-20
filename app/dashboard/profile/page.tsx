@@ -131,17 +131,20 @@ export default function ProfilePage() {
             </div>
             <div className="flex justify-between border-b pb-2">
               <span className="font-medium">Subscription:</span>
-              <span>{user.subscription?.plan || "Free"}</span>
+              <span>{user?.subscription ? user?.subscription.plan : "Free"}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Joined:</span>
               <span>
-                {new Date(user.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
+                {user?.createdAt
+                  ? new Date(user.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })
+                  : "N/A"}
               </span>
+
             </div>
           </div>
         </div>
