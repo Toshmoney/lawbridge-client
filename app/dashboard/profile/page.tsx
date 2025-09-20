@@ -60,6 +60,8 @@ export default function ProfilePage() {
       }
     } catch (err) {
       alert("Network error. Please try again.");
+      console.log(err);
+      
     } finally {
       setSaving(false);
     }
@@ -102,6 +104,8 @@ export default function ProfilePage() {
       }
     } catch (err) {
       alert("Network error. Please try again.");
+      console.log(err);
+      
     } finally {
       setChanging(false);
     }

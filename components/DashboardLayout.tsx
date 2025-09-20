@@ -1,7 +1,7 @@
 "use client";
 
 import Sidebar from "@/components/Sidebar";
-import { Bell } from "lucide-react";
+
 
 export default function DashboardLayout({
   children,

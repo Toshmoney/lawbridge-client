@@ -17,6 +17,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import Image from "next/image"; 
+
+
+type Consultation = {
+  _id: string;
+  scheduledAt: string;
+  topic: string;
+  details: string;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+};
 
 type Lawyer = {
   _id: string;
@@ -25,7 +35,7 @@ type Lawyer = {
   barCertificate: string;
   verified: boolean;
   rating: number;
-  consultations: any[];
+  consultations: Consultation[];
   createdAt: string;
 };
 
@@ -57,8 +67,13 @@ export default function LawyerProfilePage() {
         const data = await res.json();
         if (res.ok) setLawyer(data);
         else console.error("Failed to fetch lawyer:", data.error);
-      } catch (err) {
-        console.error("Network error:", err);
+      } catch (err: unknown) {
+        // ✅ Fix any → unknown
+        if (err instanceof Error) {
+          console.error("Network error:", err.message);
+        } else {
+          console.error("Unknown error:", err);
+        }
       } finally {
         setLoading(false);
       }
@@ -80,7 +95,7 @@ export default function LawyerProfilePage() {
           },
           body: JSON.stringify({
             lawyerId: id,
-            scheduledAt:scheduleAt,
+            scheduledAt: scheduleAt,
             topic,
             details,
           }),
@@ -96,8 +111,13 @@ export default function LawyerProfilePage() {
           variant: "destructive",
         });
       }
-    } catch (err: any) {
-      addToast({ title: err.message, variant: "destructive" });
+    } catch (err: unknown) {
+      // ✅ Fix any → unknown
+      if (err instanceof Error) {
+        addToast({ title: err.message, variant: "destructive" });
+      } else {
+        addToast({ title: "An unknown error occurred", variant: "destructive" });
+      }
     } finally {
       setStarting(false);
     }
@@ -111,9 +131,11 @@ export default function LawyerProfilePage() {
       {/* Profile Pic / Initial */}
       <div className="flex items-center gap-4">
         {lawyer.user.profilePic ? (
-          <img
+          <Image
             src={lawyer.user.profilePic}
             alt={lawyer.user.name}
+            width={80}
+            height={80}
             className="w-20 h-20 rounded-full object-cover"
           />
         ) : (

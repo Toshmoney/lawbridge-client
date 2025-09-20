@@ -16,21 +16,31 @@ const loginSchema = z.object({
   password: z.string().min(6),
 });
 
+type LoginFormData = z.infer<typeof loginSchema>;
+
+type User = {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  profilePic?: string;
+};
+
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
   const { addToast } = useToast();
   const { login } = useAuth();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
 
     try {
-      const result = await apiClient<{ accessToken: string; user: any }>(
+      const result = await apiClient<{ accessToken: string; user: User }>(
         "/auth/login",
         {
           method: "POST",
@@ -45,12 +55,20 @@ export default function LoginPage() {
       });
 
       window.location.href = "/dashboard";
-    } catch (err: any) {
-      addToast({
-        title: "Login Failed ❌",
-        description: err.message || "Invalid email or password",
-        variant: "destructive",
-      });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        addToast({
+          title: "Login Failed ❌",
+          description: err.message,
+          variant: "destructive",
+        });
+      } else {
+        addToast({
+          title: "Login Failed ❌",
+          description: "Invalid email or password",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -105,7 +123,10 @@ export default function LoginPage() {
         </Button>
 
         <div className="text-sm text-center mt-2">
-          Don't have an account? <a href="/signup" className="text-blue-600 hover:underline">Sign Up</a>
+          Don&apos;t have an account?{" "}
+          <a href="/signup" className="text-blue-600 hover:underline">
+            Sign Up
+          </a>
         </div>
       </form>
     </div>

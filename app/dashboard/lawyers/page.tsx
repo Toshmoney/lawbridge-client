@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
 
 type Lawyer = {
   _id: string;
@@ -99,8 +100,12 @@ export default function LawyersPage() {
           variant: "destructive",
         });
       }
-    } catch (err: any) {
-      addToast({ title: err.message, variant: "destructive" });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        addToast({ title: err.message, variant: "destructive" });
+      } else {
+        addToast({ title: "An unexpected error occurred", variant: "destructive" });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -138,9 +143,11 @@ export default function LawyersPage() {
             >
               <div className="flex items-center gap-4">
                 {lawyer.user.profilePic ? (
-                  <img
+                  <Image
                     src={lawyer.user.profilePic}
                     alt={lawyer.user.name}
+                    width={48}
+                    height={48}
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 ) : (

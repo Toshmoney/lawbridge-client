@@ -7,14 +7,13 @@ import Footer from "@/components/Footer";
 
 export default function LandingPage() {
   return (
-
     <main className="flex flex-col min-h-screen bg-white text-gray-900">
       <Navbar />
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-600 to-blue-800 text-white py-24">
         <div className="container mx-auto px-6 text-center max-w-4xl">
           <h1 className="text-3xl md:text-6xl font-bold leading-tight">
-            Smart Legal Documents & Lawyer Access
+            Smart Legal Documents &amp; Lawyer Access
           </h1>
           <p className="mt-6 text-lg md:text-xl text-blue-100">
             Generate contracts in minutes, consult verified lawyers, and manage your legal needs — all in one place.
@@ -26,7 +25,11 @@ export default function LandingPage() {
               </Button>
             </Link>
             <Link href="/login">
-              <Button size="lg" variant="outline" className="text-white cursor-pointer border-white bg-transparent hover:border-black hover:bg-black hover:text-white">
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-white cursor-pointer border-white bg-transparent hover:border-black hover:bg-black hover:text-white"
+              >
                 Login
               </Button>
             </Link>
@@ -62,7 +65,7 @@ export default function LandingPage() {
               <CardTitle>Dual Accounts</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Separate dashboards for Clients & Lawyers, tailored to their needs.</p>
+              <p>Separate dashboards for Clients &amp; Lawyers, tailored to their needs.</p>
             </CardContent>
           </Card>
         </div>
@@ -106,13 +109,13 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-2 gap-8">
           <Card className="p-6 shadow-md">
             <p className="text-gray-700 italic">
-              "Lawbridge helped me draft my tenancy agreement in minutes. Saved me time and money!"
+              &quot;Lawbridge helped me draft my tenancy agreement in minutes. Saved me time and money!&quot;
             </p>
             <p className="mt-4 font-semibold">– Adebayo, Tenant</p>
           </Card>
           <Card className="p-6 shadow-md">
             <p className="text-gray-700 italic">
-              "As a lawyer, I love how easy it is to get clients through Lawbridge."
+              &quot;As a lawyer, I love how easy it is to get clients through Lawbridge.&quot;
             </p>
             <p className="mt-4 font-semibold">– Chidinma, Corporate Lawyer</p>
           </Card>

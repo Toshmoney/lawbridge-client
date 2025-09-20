@@ -40,6 +40,8 @@ export default function DashboardProtectedLayout({
       } catch (err) {
         logout();
         router.replace("/login?error=network");
+        console.log(err);
+        
       } finally {
         setChecking(false);
       }

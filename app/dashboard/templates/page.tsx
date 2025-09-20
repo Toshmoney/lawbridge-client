@@ -64,7 +64,7 @@ export default function TemplatesPage() {
       }
     };
     fetchTemplates();
-  }, [token]);
+  }, [token, addToast]);
 
   // open edit popup
   const handleEdit = (template: Template) => {

@@ -13,20 +13,20 @@ const forgotSchema = z.object({
   email: z.string().email(),
 });
 
+type ForgotFormData = z.infer<typeof forgotSchema>;
+
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors } } = useForm<ForgotFormData>({
     resolver: zodResolver(forgotSchema),
   });
 
   const { addToast } = useToast();
-  const onSubmit = async(data: any) => {
-  setLoading(true)
 
-  console.log(data);
-  
+  const onSubmit = async (data: ForgotFormData) => {
+    setLoading(true);
 
-  try {
+    try {
       const result = await apiClient<{ message: string }>(
         "/auth/reset-password",
         {
@@ -40,25 +40,49 @@ export default function ForgotPasswordPage() {
         description: result.message,
       });
 
-    } catch (err: any) {
-      addToast({
-        title: "Password Reset Failed ❌",
-        description: err.message,
-        variant: "destructive",
-      });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        addToast({
+          title: "Password Reset Failed ❌",
+          description: err.message,
+          variant: "destructive",
+        });
+      } else {
+        addToast({
+          title: "Password Reset Failed ❌",
+          description: "An unexpected error occurred",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
-    
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded-2xl shadow-md w-96 space-y-4">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-white p-8 rounded-2xl shadow-md w-96 space-y-4"
+      >
         <h2 className="text-2xl font-bold text-center">Forgot Password</h2>
-        <Input type="email" placeholder="Enter your email" {...register("email")} />
-        {errors.email && <p className="text-red-500 text-sm">{errors.email.message?.toString()}</p>}
-        <Button type="submit" className={`w-full ${loading ? "cursor-not-allowed" : "cursor-pointer"}`} disabled={loading}>{loading ? "Sending Reset Link..." : "Send Reset Link"}</Button>
+        <Input
+          type="email"
+          placeholder="Enter your email"
+          {...register("email")}
+        />
+        {errors.email && (
+          <p className="text-red-500 text-sm">
+            {errors.email.message?.toString()}
+          </p>
+        )}
+        <Button
+          type="submit"
+          className={`w-full ${loading ? "cursor-not-allowed" : "cursor-pointer"}`}
+          disabled={loading}
+        >
+          {loading ? "Sending Reset Link..." : "Send Reset Link"}
+        </Button>
       </form>
     </div>
   );

@@ -50,6 +50,14 @@ type Document = {
   templateType: string;
 };
 
+type DocumentPayload = {
+  title: string;
+  fields: Record<string, string>;
+  templateMode: "system" | "custom";
+  templateType?: string;
+  customTemplateId?: string;
+};
+
 export default function DocumentsPage() {
   const { token } = useAuth();
   const { addToast } = useToast();
@@ -150,7 +158,7 @@ export default function DocumentsPage() {
 
     setCreating(true);
     try {
-      const body: any = {
+      const body: DocumentPayload = {
         title: newTitle,
         fields,
         templateMode: mode,
@@ -159,7 +167,6 @@ export default function DocumentsPage() {
       if (mode === "system") {
         body.templateType = newTemplate;
       } else {
-        // body.templateType = selectedCustom; 
         body.customTemplateId = selectedCustom;
       }
 
@@ -181,7 +188,8 @@ export default function DocumentsPage() {
       } else {
         if (res.status === 401) {
           addToast({ title: "Session expired. Please log in." });
-          return (window.location.href = "/login");
+          window.location.href = "/login";
+          return;
         } else {
           return addToast({
             title: data.message || "Failed to create document",
@@ -233,12 +241,20 @@ export default function DocumentsPage() {
       window.URL.revokeObjectURL(url);
 
       addToast({ title: "File downloaded successfully!" });
-    } catch (error: any) {
-      addToast({
-        title: "Download Failed ❌",
-        description: error.message,
-        variant: "destructive",
-      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        addToast({
+          title: "Download Failed ❌",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        addToast({
+          title: "Download Failed ❌",
+          description: "An unknown error occurred",
+          variant: "destructive",
+        });
+      }
     } finally {
       fileType === "pdf" ? setDownloadingPdfId(null) : setDownloadingWordId(null);
     }
