@@ -185,6 +185,7 @@ export default function DocumentsPage() {
         setNewTitle("");
         setFields({});
         addToast({ title: "Document created successfully" });
+        window.location.href = "/dashboard/document"
       } else {
         if (res.status === 401) {
           addToast({ title: "Session expired. Please log in." });

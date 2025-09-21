@@ -55,7 +55,11 @@ export default function TemplatesPage() {
         if (res.ok) {
           setTemplates(data);
         } else {
-          addToast({ title: "❌ Error", description: data.message || "Failed to fetch templates" });
+          if (res.status != 404){
+            addToast({ title: "❌ Error", description: data.message || "Failed to fetch templates" });
+            return;
+          }
+          return null;
         }
       } catch (err) {
         addToast({ title: "❌ Network Error", description: String(err) });

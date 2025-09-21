@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea"; // ✅ if you have a textarea component
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
@@ -13,7 +14,10 @@ export default function ProfilePage() {
   // Profile form state
   const [form, setForm] = useState({
     name: user?.name || "",
+    profileDescription: user?.profileDescription || "",
   });
+  const [profilePic, setProfilePic] = useState<File | null>(null);
+  const [preview, setPreview] = useState(user?.profilePicture || "");
   const [saving, setSaving] = useState(false);
 
   // Password form state
@@ -24,12 +28,15 @@ export default function ProfilePage() {
   });
   const [changing, setChanging] = useState(false);
 
-  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPasswords({ ...passwords, [e.target.name]: e.target.value });
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfilePic(e.target.files[0]);
+      setPreview(URL.createObjectURL(e.target.files[0]));
+    }
   };
 
   // Update profile
@@ -39,17 +46,18 @@ export default function ProfilePage() {
     setSaving(true);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(form),
-        }
-      );
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("profileDescription", form.profileDescription);
+      if (profilePic) formData.append("profilePicture", profilePic);
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
 
       const data = await res.json();
       if (res.ok) {
@@ -60,14 +68,17 @@ export default function ProfilePage() {
       }
     } catch (err) {
       alert("Network error. Please try again.");
-      console.log(err);
-      
+      console.error(err);
     } finally {
       setSaving(false);
     }
   };
 
   // Change password
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPasswords({ ...passwords, [e.target.name]: e.target.value });
+  };
+
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
@@ -79,20 +90,17 @@ export default function ProfilePage() {
 
     setChanging(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/change-password`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            currentPassword: passwords.currentPassword,
-            newPassword: passwords.newPassword,
-          }),
-        }
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword: passwords.currentPassword,
+          newPassword: passwords.newPassword,
+        }),
+      });
 
       const data = await res.json();
       if (res.ok) {
@@ -104,8 +112,7 @@ export default function ProfilePage() {
       }
     } catch (err) {
       alert("Network error. Please try again.");
-      console.log(err);
-      
+      console.error(err);
     } finally {
       setChanging(false);
     }
@@ -114,15 +121,28 @@ export default function ProfilePage() {
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto p-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl py-6">
       {/* Left: Profile Overview */}
       <div className="bg-white shadow-md rounded-2xl p-6">
         <div className="flex flex-col items-center text-center">
-          <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center text-2xl font-bold text-blue-600">
-            {user.name?.charAt(0)}
-          </div>
+          {/* Avatar */}
+          {preview ? (
+            <img
+              src={preview}
+              alt="Profile"
+              className="w-24 h-24 rounded-full object-cover border"
+            />
+          ) : (
+            <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center text-2xl font-bold text-blue-600">
+              {user.name?.charAt(0)}
+            </div>
+          )}
+
           <h2 className="text-xl font-bold mt-4">{user.name}</h2>
           <p className="text-gray-500">{user.email}</p>
+          {user.profileDescription && (
+            <p className="mt-2 text-sm text-gray-600">{user.profileDescription}</p>
+          )}
 
           <div className="mt-4 space-y-2 w-full text-sm">
             <div className="flex justify-between border-b pb-2">
@@ -144,7 +164,6 @@ export default function ProfilePage() {
                     })
                   : "N/A"}
               </span>
-
             </div>
           </div>
         </div>
@@ -154,6 +173,12 @@ export default function ProfilePage() {
       <div className="bg-white shadow-md rounded-2xl p-6">
         <h3 className="text-lg font-semibold mb-4">Edit Profile</h3>
         <form onSubmit={handleProfileSubmit} className="space-y-4">
+          {/* Profile Picture Upload */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Profile Picture</label>
+            <Input type="file" accept="image/*" onChange={handleFileChange} />
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Name</label>
             <Input
@@ -161,6 +186,17 @@ export default function ProfilePage() {
               name="name"
               value={form.name}
               onChange={handleProfileChange}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Profile Description</label>
+            <Textarea
+              name="profileDescription"
+              value={form.profileDescription}
+              onChange={handleProfileChange}
+              rows={3}
+              placeholder="Tell us about yourself..."
             />
           </div>
 
@@ -180,9 +216,7 @@ export default function ProfilePage() {
         <h3 className="text-lg font-semibold mb-4">Change Password</h3>
         <form onSubmit={handlePasswordSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Current Password
-            </label>
+            <label className="block text-sm font-medium mb-1">Current Password</label>
             <Input
               type="password"
               name="currentPassword"
@@ -204,9 +238,7 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Confirm New Password
-            </label>
+            <label className="block text-sm font-medium mb-1">Confirm New Password</label>
             <Input
               type="password"
               name="confirmPassword"
