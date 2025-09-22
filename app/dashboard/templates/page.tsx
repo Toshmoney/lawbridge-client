@@ -51,6 +51,14 @@ declare global {
   }
 }
 
+type PaystackResponse = {
+  reference: string;
+  status?: string;
+  message?: string;
+  [key: string]: unknown;
+};
+
+
 
 export default function TemplatesPage() {
   const { token, user } = useAuth();
@@ -241,22 +249,26 @@ export default function TemplatesPage() {
     amount: Number(template.price) * 100,
     currency: "NGN",
     ref: `TEMPLATE_${template._id}_${Date.now()}`,
-    callback: (response: any) => {
-      addToast({ title: "✅ Payment successful", description: `Ref: ${response.reference}` });
+    callback: (response: PaystackResponse) => {
+  addToast({
+    title: "✅ Payment successful",
+    description: `Ref: ${response.reference}`,
+  });
 
-      // 🔗 Call backend to finalize purchase
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/purchase-template/verify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          reference: response.reference,
-          templateId: template._id,
-        }),
-      });
+  // 🔗 Call backend to finalize purchase
+  fetch(`${process.env.NEXT_PUBLIC_API_URL}/purchase-template/verify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
+    body: JSON.stringify({
+      reference: response.reference,
+      templateId: template._id,
+    }),
+  });
+},
+
     onClose: () => { 
       addToast({ title: "⚠️ Payment cancelled" });
     },
