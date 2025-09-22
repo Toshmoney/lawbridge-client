@@ -19,7 +19,7 @@ import Image from "next/image";
 
 type Lawyer = {
   _id: string;
-  user: { _id: string; name: string; email: string; profilePic?: string };
+  user: { _id: string; name: string; email: string; profilePicture?: string, profileDescription:string };
   specialization: string[];
   verified: boolean;
 };
@@ -137,42 +137,43 @@ export default function LawyersPage() {
           <p>Loading lawyers...</p>
         ) : filteredLawyers.length > 0 ? (
           filteredLawyers.map((lawyer) => (
-            <div
-              key={lawyer._id}
-              className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm"
-            >
-              <div className="flex items-center gap-4">
-                {lawyer.user.profilePic ? (
-                  <Image
-                    src={lawyer.user.profilePic}
-                    alt={lawyer.user.name}
-                    width={48}
-                    height={48}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-lg font-bold text-blue-600">
-                    {lawyer.user.name.charAt(0)}
-                  </div>
-                )}
-
-                <div>
-                  <h2 className="text-lg font-semibold flex items-center gap-2">
-                    {lawyer.user.name}
-                    {lawyer.verified && (
-                      <CheckCircle className="text-blue-600 w-4 h-4" />
-                    )}
-                  </h2>
-                  <p className="text-gray-600 text-sm">
-                    {lawyer.specialization.join(", ")}
-                  </p>
+          <div
+            key={lawyer._id}
+            className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm"
+          >
+            <div className="flex items-center gap-4">
+              {lawyer.user.profilePicture ? (
+                <Image
+                  src={lawyer.user.profilePicture}
+                  alt={lawyer.user.name}
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 rounded-full object-cover border"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-lg font-bold text-blue-600">
+                  {lawyer.user.name?.charAt(0)}
                 </div>
-              </div>
+              )}
 
-              <Link href={`/dashboard/lawyers/${lawyer._id}`}>
-                <Button>View Profile</Button>
-              </Link>
+              <div>
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  {lawyer.user.name}
+                  {lawyer.verified && (
+                    <CheckCircle className="text-blue-600 w-4 h-4" />
+                  )}
+                </h2>
+                <p className="text-gray-600 text-sm">
+                  {lawyer.specialization.join(", ")}
+                </p>
+              </div>
             </div>
+
+            <Link href={`/dashboard/lawyers/${lawyer._id}`}>
+              <Button>View Profile</Button>
+            </Link>
+          </div>
+
           ))
         ) : (
           <p className="text-gray-500">No lawyers found</p>

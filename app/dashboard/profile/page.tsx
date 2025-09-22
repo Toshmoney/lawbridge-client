@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea"; // ✅ if you have a textarea component
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function ProfilePage() {
   const { user, token, login, logout } = useAuth();
@@ -127,8 +128,10 @@ export default function ProfilePage() {
         <div className="flex flex-col items-center text-center">
           {/* Avatar */}
           {preview ? (
-            <img
+            <Image
               src={preview}
+              width={48}
+              height={48}
               alt="Profile"
               className="w-24 h-24 rounded-full object-cover border"
             />

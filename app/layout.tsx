@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { ToastProvider } from "@/components/ui/use-toast";
 import { AuthProvider } from "@/context/AuthContext";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -81,6 +82,11 @@ export default function RootLayout({
         <AuthProvider>
           <ToastProvider>{children}</ToastProvider>
         </AuthProvider>
+        
+        <Script
+          src="https://js.paystack.co/v1/inline.js"
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );

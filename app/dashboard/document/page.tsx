@@ -257,7 +257,11 @@ export default function DocumentsPage() {
         });
       }
     } finally {
-      fileType === "pdf" ? setDownloadingPdfId(null) : setDownloadingWordId(null);
+      if(fileType === "pdf"){
+        setDownloadingPdfId(null)
+       }else{
+        setDownloadingWordId(null);
+       }
     }
   };
 

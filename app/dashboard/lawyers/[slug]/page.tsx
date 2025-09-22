@@ -17,8 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import Image from "next/image"; 
-
+import Image from "next/image";
 
 type Consultation = {
   _id: string;
@@ -30,7 +29,13 @@ type Consultation = {
 
 type Lawyer = {
   _id: string;
-  user: { _id: string; name: string; email: string; profilePic?: string };
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+    profilePicture?: string;
+    profileDescription?: string;
+  };
   specialization: string[];
   barCertificate: string;
   verified: boolean;
@@ -68,7 +73,6 @@ export default function LawyerProfilePage() {
         if (res.ok) setLawyer(data);
         else console.error("Failed to fetch lawyer:", data.error);
       } catch (err: unknown) {
-        // ✅ Fix any → unknown
         if (err instanceof Error) {
           console.error("Network error:", err.message);
         } else {
@@ -112,7 +116,6 @@ export default function LawyerProfilePage() {
         });
       }
     } catch (err: unknown) {
-      // ✅ Fix any → unknown
       if (err instanceof Error) {
         addToast({ title: err.message, variant: "destructive" });
       } else {
@@ -128,15 +131,15 @@ export default function LawyerProfilePage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Profile Pic / Initial */}
+      {/* Profile Picture / Initial */}
       <div className="flex items-center gap-4">
-        {lawyer.user.profilePic ? (
+        {lawyer.user.profilePicture ? (
           <Image
-            src={lawyer.user.profilePic}
+            src={lawyer.user.profilePicture}
             alt={lawyer.user.name}
             width={80}
             height={80}
-            className="w-20 h-20 rounded-full object-cover"
+            className="w-20 h-20 rounded-full object-cover border"
           />
         ) : (
           <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center text-2xl font-bold text-blue-600">
@@ -151,6 +154,11 @@ export default function LawyerProfilePage() {
             )}
           </h1>
           <p className="text-gray-600">{lawyer.user.email}</p>
+          {lawyer.user.profileDescription && (
+            <p className="text-gray-500 text-sm mt-1">
+              {lawyer.user.profileDescription}
+            </p>
+          )}
         </div>
       </div>
 

@@ -97,7 +97,7 @@ function SidebarNav() {
           href="/dashboard/templates"
           className={linkClasses("/dashboard/templates")}
         >
-          <BookCopy size={18} /> Templates
+          <BookCopy size={18} />{user?.role === "client"? "Buy Templates":"Templates"}
         </Link>
         
         <Link

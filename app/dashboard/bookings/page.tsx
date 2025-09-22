@@ -75,7 +75,7 @@ export default function BookingsPage() {
     };
 
     fetchBookings();
-  }, [token]);
+  }, [token, addToast, user?.role]);
 
   return (
     <div className="p-6 space-y-6">

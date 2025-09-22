@@ -23,7 +23,8 @@ type User = {
   name: string;
   email: string;
   role: string;
-  profilePic?: string;
+  profilePicture: string;
+  profileDescription: string
 };
 
 export default function LoginPage() {

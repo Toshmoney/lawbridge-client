@@ -11,6 +11,8 @@ type User = {
   name: string
   email: string
   role: string
+  profileDescription: string
+  profilePicture: string
   createdAt?: string
   subscription?: {
     plan: string
