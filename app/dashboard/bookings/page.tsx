@@ -22,7 +22,7 @@ type Consultation = {
   user: { _id: string; name: string; email?: string };
   topic: string;
   details: string;
-  createdAt: string;
+  scheduledAt: string;
 };
 
 export default function BookingsPage() {
@@ -94,7 +94,7 @@ export default function BookingsPage() {
                 <th className="p-4">Client</th>
                 <th className="p-4">Lawyer</th>
                 <th className="p-4">Topic</th>
-                <th className="p-4">Date</th>
+                <th className="p-4">Scheduled Date</th>
                 <th className="p-4">Action</th>
               </tr>
             </thead>
@@ -111,7 +111,7 @@ export default function BookingsPage() {
                   </td>
                   <td className="p-4">{c.topic}</td>
                   <td className="p-4">
-                    {new Date(c.createdAt).toLocaleDateString("en-US", {
+                    {new Date(c.scheduledAt).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "short",
                       day: "numeric",
@@ -177,8 +177,8 @@ export default function BookingsPage() {
                 <strong>Details:</strong> {selected.details}
               </p>
               <p>
-                <strong>Date:</strong>{" "}
-                {new Date(selected.createdAt).toLocaleString()}
+                <strong>Scheduled Date:</strong>{" "}
+                {new Date(selected.scheduledAt).toLocaleString()}
               </p>
             </div>
           )}

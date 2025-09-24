@@ -42,6 +42,7 @@ type Lawyer = {
   rating: number;
   consultations: Consultation[];
   createdAt: string;
+  consultationFee:Number
 };
 
 export default function LawyerProfilePage() {
@@ -61,6 +62,8 @@ export default function LawyerProfilePage() {
 
   useEffect(() => {
     if (!id || !token) return;
+    console.log(id);
+    
     const fetchLawyer = async () => {
       try {
         const res = await fetch(
@@ -98,7 +101,7 @@ export default function LawyerProfilePage() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            lawyerId: id,
+            lawyerId: lawyer._id,
             scheduledAt: scheduleAt,
             topic,
             details,
@@ -176,6 +179,10 @@ export default function LawyerProfilePage() {
         <p>
           <strong>Bar Certificate:</strong> {lawyer.barCertificate}
         </p>
+
+        <p className="text-black"><strong>Consultation Fee </strong>
+          <span className="text-green-600 "> ₦{lawyer.consultationFee?.toLocaleString() || "N/A"}</span>
+          </p>
         <p>
           <strong>Rating:</strong> {lawyer.rating} / 5
         </p>

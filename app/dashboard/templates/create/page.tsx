@@ -19,6 +19,7 @@ export default function CreateTemplatePage() {
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [loading, setLoading] = useState(false);
   const [templateType, setTemplateType] = useState("");
+  const [amount, setAmount] = useState(0);
 
   const addField = () => {
     if (fieldInput.trim() && !fields.includes(fieldInput.trim())) {
@@ -32,13 +33,13 @@ export default function CreateTemplatePage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/custom-templates`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/custom-templates/market`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, fields, content, visibility, templateType }),
+        body: JSON.stringify({ title, fields, content, visibility, templateType, price:amount }),
       });
 
       const data = await res.json();
@@ -48,6 +49,7 @@ export default function CreateTemplatePage() {
         setFields([]);
         setContent("");
         setVisibility("private");
+        setAmount(0)
         return window.location.href = "/dashboard/templates";
       } else {
         addToast({ title: "❌ Error", description: data.message || "Failed to create template" });
@@ -119,6 +121,19 @@ export default function CreateTemplatePage() {
             placeholder="e.g. NDA, Contract"
             value={templateType}
             onChange={(e) => setTemplateType(e.target.value)}
+            required
+          />
+         </div>
+
+
+         {/* template amount */}
+         <div>
+          <Label htmlFor="price">Template Amount</Label>
+          <Input
+            id="price"
+            placeholder="e.g. 2000"
+            value={amount}
+            onChange={(e) => setAmount(Number(e.target.value))}
             required
           />
          </div>

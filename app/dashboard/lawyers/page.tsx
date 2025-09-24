@@ -19,8 +19,15 @@ import Image from "next/image";
 
 type Lawyer = {
   _id: string;
-  user: { _id: string; name: string; email: string; profilePicture?: string, profileDescription:string };
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+    profilePicture?: string;
+    profileDescription: string;
+  };
   specialization: string[];
+  consultationFee?: number;
   verified: boolean;
 };
 
@@ -35,6 +42,7 @@ export default function LawyersPage() {
   // Dialog state
   const [open, setOpen] = useState(false);
   const [specialization, setSpecialization] = useState("");
+  const [consultationFee, setConsultationFee] = useState<number>(0);
   const [barCert, setBarCert] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -71,10 +79,14 @@ export default function LawyersPage() {
   });
 
   const createLawyerAccount = async () => {
-    if (!specialization || !barCert) {
-      addToast({ title: "Fill all fields", variant: "destructive" });
+    if (!specialization || !barCert || consultationFee <= 0) {
+      addToast({
+        title: "All fields are required",
+        variant: "destructive",
+      });
       return;
     }
+
     setSubmitting(true);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/lawyers`, {
@@ -86,14 +98,17 @@ export default function LawyersPage() {
         body: JSON.stringify({
           specialization: specialization.split(",").map((s) => s.trim()),
           barCertificate: barCert,
+          consultationFee,
         }),
       });
+
       const data = await res.json();
       if (res.ok) {
         addToast({ title: "Lawyer account created ✅" });
         setOpen(false);
         setSpecialization("");
         setBarCert("");
+        setConsultationFee(0);
       } else {
         addToast({
           title: data.message || "Failed to create account",
@@ -104,7 +119,10 @@ export default function LawyersPage() {
       if (err instanceof Error) {
         addToast({ title: err.message, variant: "destructive" });
       } else {
-        addToast({ title: "An unexpected error occurred", variant: "destructive" });
+        addToast({
+          title: "An unexpected error occurred",
+          variant: "destructive",
+        });
       }
     } finally {
       setSubmitting(false);
@@ -137,43 +155,45 @@ export default function LawyersPage() {
           <p>Loading lawyers...</p>
         ) : filteredLawyers.length > 0 ? (
           filteredLawyers.map((lawyer) => (
-          <div
-            key={lawyer._id}
-            className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm"
-          >
-            <div className="flex items-center gap-4">
-              {lawyer.user.profilePicture ? (
-                <Image
-                  src={lawyer.user.profilePicture}
-                  alt={lawyer.user.name}
-                  width={48}
-                  height={48}
-                  className="w-12 h-12 rounded-full object-cover border"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-lg font-bold text-blue-600">
-                  {lawyer.user.name?.charAt(0)}
+            <div
+              key={lawyer._id}
+              className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm"
+            >
+              <div className="flex items-center gap-4">
+                {lawyer.user.profilePicture ? (
+                  <Image
+                    src={lawyer.user.profilePicture}
+                    alt={lawyer.user.name}
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 rounded-full object-cover border"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-lg font-bold text-blue-600">
+                    {lawyer.user.name?.charAt(0)}
+                  </div>
+                )}
+
+                <div>
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    {lawyer.user.name}
+                    {lawyer.verified && (
+                      <CheckCircle className="text-blue-600 w-4 h-4" />
+                    )}
+                  </h2>
+                  <p className="text-gray-600 text-sm">
+                    {lawyer.specialization.join(", ")}
+                  </p>
+                  <p className="text-gray-500 font-medium text-sm">
+                    Consultation Fee <span className="text-green-600 ">₦{lawyer.consultationFee?.toLocaleString() || "N/A"}</span>
+                  </p>
                 </div>
-              )}
-
-              <div>
-                <h2 className="text-lg font-semibold flex items-center gap-2">
-                  {lawyer.user.name}
-                  {lawyer.verified && (
-                    <CheckCircle className="text-blue-600 w-4 h-4" />
-                  )}
-                </h2>
-                <p className="text-gray-600 text-sm">
-                  {lawyer.specialization.join(", ")}
-                </p>
               </div>
+
+              <Link href={`/dashboard/lawyers/${lawyer._id}`}>
+                <Button>View Profile</Button>
+              </Link>
             </div>
-
-            <Link href={`/dashboard/lawyers/${lawyer._id}`}>
-              <Button>View Profile</Button>
-            </Link>
-          </div>
-
           ))
         ) : (
           <p className="text-gray-500">No lawyers found</p>
@@ -188,11 +208,20 @@ export default function LawyersPage() {
           </DialogHeader>
 
           <div className="space-y-4">
+            <label htmlFor="">Enter Specialization</label>
             <Input
               placeholder="Specializations (comma separated)"
               value={specialization}
               onChange={(e) => setSpecialization(e.target.value)}
             />
+            <label htmlFor="">Consultation Fee (₦)</label>
+            <Input
+              placeholder="Consultation Fee"
+              type="number"
+              value={consultationFee}
+              onChange={(e) => setConsultationFee(Number(e.target.value))}
+            />
+            <label htmlFor="">Upload Bar Certificate</label>
             <Textarea
               placeholder="Bar Certificate ID / File Ref"
               value={barCert}

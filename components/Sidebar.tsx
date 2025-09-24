@@ -77,12 +77,6 @@ function SidebarNav() {
           </Link>): (
           <>
               <Link
-                href="/dashboard/bookings"
-                className={linkClasses("/dashboard/bookings")}
-              >
-                <Book size={18} /> Bookings
-              </Link>
-              <Link
                 href="/dashboard/wallet"
                 className={linkClasses("/dashboard/wallet")}
               >
@@ -92,6 +86,13 @@ function SidebarNav() {
         
       )
         }
+
+        <Link
+            href="/dashboard/bookings"
+            className={linkClasses("/dashboard/bookings")}
+          >
+            <Book size={18} /> Bookings
+          </Link>
 
         <Link
           href="/dashboard/templates"

@@ -110,7 +110,7 @@ export default function TemplatesPage() {
     const fetchMarketTemplates = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/custom-templates`,
+          `${process.env.NEXT_PUBLIC_API_URL}/custom-templates/market`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -119,10 +119,7 @@ export default function TemplatesPage() {
         if (res.ok) {
           setMarketTemplates(data);
         } else if (res.status !== 404) {
-          addToast({
-            title: "❌ Error",
-            description: data.message || "Failed to fetch marketplace templates",
-          });
+          console.log( data.message || "Failed to fetch marketplace templates")
         }
       } catch (err) {
         addToast({ title: "❌ Network Error", description: String(err) });
@@ -387,7 +384,7 @@ export default function TemplatesPage() {
 
         {/* Edit Popup (only for lawyers) */}
         <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {previewMode ? "Preview Template" : "Edit Template"}
