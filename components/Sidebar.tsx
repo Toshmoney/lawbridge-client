@@ -94,6 +94,13 @@ function SidebarNav() {
             <Book size={18} /> Bookings
           </Link>
 
+          <Link
+            href="/dashboard/chats"
+            className={linkClasses("/dashboard/chats")}
+          >
+            <Book size={18} /> Chats
+          </Link>
+
         <Link
           href="/dashboard/templates"
           className={linkClasses("/dashboard/templates")}

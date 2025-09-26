@@ -19,6 +19,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 
+// import chat icon
+import { MessageSquare } from "lucide-react";
+
 type Consultation = {
   _id: string;
   scheduledAt: string;
@@ -174,6 +177,21 @@ export default function LawyerProfilePage() {
         ))}
       </div>
 
+      {/* chat button */}
+
+          <div className="mb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-blue-600 text-white cursor-pointer hover:bg-blue-700 hover:text-white"
+              onClick={() =>
+                (window.location.href = `/dashboard/chats/${lawyer.user._id}`)
+              }
+            >
+              Chat with Lawyer {lawyer.user.name} <MessageSquare className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+
       {/* Info */}
       <div className="space-y-2">
         <p>
@@ -196,6 +214,8 @@ export default function LawyerProfilePage() {
         </p>
       </div>
 
+       
+
       {/* Book Consultation Popup */}
       <Dialog>
         <DialogTrigger asChild>
@@ -207,6 +227,8 @@ export default function LawyerProfilePage() {
           <DialogHeader>
             <DialogTitle>Book Consultation</DialogTitle>
           </DialogHeader>
+
+         
           <div className="space-y-4">
             <div>
               <Label>Schedule At</Label>
