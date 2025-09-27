@@ -204,7 +204,7 @@ export default function LawyersPage() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create Lawyer Account</DialogTitle>
+            <DialogTitle>Create Lawyer Account (comma separated)</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -214,7 +214,7 @@ export default function LawyersPage() {
               value={specialization}
               onChange={(e) => setSpecialization(e.target.value)}
             />
-            <label htmlFor="">Consultation Fee (₦)</label>
+            <label htmlFor="">Set Your Consultation Fee (₦)</label>
             <Input
               placeholder="Consultation Fee"
               type="number"

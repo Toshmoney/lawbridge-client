@@ -36,7 +36,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (!user?._id) return;
 
-    const socket = io("http://localhost:4000", {
+    const socket = io("https://lawbridge-a0gx.onrender.com", {
       transports: ["websocket"],
       reconnection: true,
     });
@@ -158,7 +158,18 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
+      {/* Header */}
       <div className="flex items-center gap-2 p-3 border-b">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push("/dashboard/chats")}
+          className="mr-2 cursor-pointer"
+        >
+          ← Back
+        </Button>
+
         <h2 className="font-semibold">{receiverName}</h2>
         <div
           className={`w-3 h-3 rounded-full ${
@@ -170,21 +181,21 @@ export default function ChatPage() {
         </span>
 
         {/* Check if user is a lawyer */}
-        {
-          receiver?.role === 'lawyer' && (
-            <div className="ml-auto">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.replace(`/dashboard/lawyers/${receiver.lawyerId}`)}
-              >
-                Book Consultation
-              </Button>
-        </div>
-          )
-        }
-        
+        {receiver?.role === "lawyer" && (
+          <div className="ml-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                router.replace(`/dashboard/lawyers/${receiver.lawyerId}`)
+              }
+            >
+              Book Consultation
+            </Button>
+          </div>
+        )}
       </div>
+
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2">

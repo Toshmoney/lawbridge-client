@@ -19,22 +19,31 @@ export default function ChatListPage() {
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!user || !token) return;
+    if (!token) {
+      console.log("token",token);
+      
+      // alert(`user: ${user}, token: ${token}`);
+      alert("Session expired. Please log in again.");
+      window.location.href = "/login";
+      return;
+    };
 
     // fetch conversations
     const fetchConversations = async () => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations`,
+        `${process.env.NEXT_PUBLIC_API_URL}/conversations`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
+      console.log(data);
+      
       setConversations(data);
     };
     fetchConversations();
 
     // connect socket
     socket = io(process.env.NEXT_PUBLIC_API_URL!, { transports: ["websocket"] });
-    socket.emit("join", user._id);
+    socket.emit("join", user?._id);
 
     socket.on("userOnline", (id: string) =>
       setOnlineUsers((prev) => [...prev, id])
