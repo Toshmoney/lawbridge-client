@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import io from "socket.io-client";
+import { io, Socket } from "socket.io-client";
+
 import Link from "next/link";
 
 type Conversation = {
@@ -11,7 +12,7 @@ type Conversation = {
   lastDate: string;
 };
 
-let socket: any;
+let socket: Socket | null = null;
 
 export default function ChatListPage() {
   const { token, user } = useAuth();
@@ -53,7 +54,7 @@ export default function ChatListPage() {
     );
 
     return () => {
-      socket.disconnect();
+      socket?.disconnect();
     };
   }, [user, token]);
 

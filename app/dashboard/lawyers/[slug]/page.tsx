@@ -45,7 +45,7 @@ type Lawyer = {
   rating: number;
   consultations: Consultation[];
   createdAt: string;
-  consultationFee:Number
+  consultationFee:number
 };
 
 export default function LawyerProfilePage() {

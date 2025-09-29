@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useParams } from "next/navigation";
 import { useRouter as Router } from "next/navigation";
-import { set } from "zod";
 
 type Message = {
   _id: string;
@@ -25,7 +24,7 @@ export default function ChatPage() {
   const [isReceiverOnline, setIsReceiverOnline] = useState(false);
   const [receiverName, setReceiverName] = useState("User");
   const [isTyping, setIsTyping] = useState(false);
-  const [receiver, setReceiver] = useState<{ _id: string; name: string; email: string, role:string } | null>(null);
+  const [receiver, setReceiver] = useState<{ _id: string; name: string; email: string, role:string, lawyerId: string } | null>(null);
 
   const { id: receiverId } = useParams();
   const bottomRef = useRef<HTMLDivElement>(null);
