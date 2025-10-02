@@ -14,11 +14,11 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Toggler */}
-      <div className="md:hidden p-4 border-b">
+      <div className="md:hidden py-4 border-b">
         <div className="text-xl font-bold text-blue-600 hidden md:block">Lawbridge</div>
         <Sheet>
           <SheetTrigger asChild>
-            <button className="p-2 rounded-lg hover:bg-gray-100">
+            <button className="p-2 rounded-lg hover:bg-gray-100 cursor-pointer">
               <Menu size={24} />
             </button>
           </SheetTrigger>

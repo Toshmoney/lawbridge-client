@@ -191,7 +191,7 @@ export default function DocumentsPage() {
 
   // download file
   const handleDownload = async (docId: string, type: "pdf" | "word") => {
-    setDownloadingId(docId + type); // unique state per type
+    setDownloadingId(docId + type);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/documents/download-${type}/${docId}`,
@@ -210,7 +210,7 @@ export default function DocumentsPage() {
       link.click();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      addToast({ title: "❌ Error", description: String(err) });
+      addToast({ title: "Error", description: String(err) });
     } finally {
       setDownloadingId(null);
     }
@@ -238,7 +238,69 @@ export default function DocumentsPage() {
             <DialogHeader>
               <DialogTitle>Create New Document</DialogTitle>
             </DialogHeader>
-            {/* ... your new document creation form remains same ... */}
+            <div className="space-y-4">
+              <Label>Title</Label>
+              <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
+
+              <Label>Choose Template Source</Label>
+              <select
+                value={mode}
+                onChange={(e) => setMode(e.target.value as "system" | "custom")}
+                className="w-full border rounded-lg p-2"
+              >
+                <option value="system">System Templates</option>
+                <option value="custom">Purchased Templates</option>
+              </select>
+
+              {mode === "system" && (
+                <select
+                  value={newTemplate}
+                  onChange={(e) => setNewTemplate(e.target.value)}
+                  className="w-full border rounded-lg p-2"
+                >
+                  {Object.keys(systemTemplates).map((key) => (
+                    <option key={key} value={key}>
+                      {systemTemplates[key].title}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {mode === "custom" &&
+                (purchasedTemplates.length > 0 ? (
+                  <select
+                    value={selectedCustom}
+                    onChange={(e) => setSelectedCustom(e.target.value)}
+                    className="w-full border rounded-lg p-2"
+                  >
+                    <option value="">-- Select Purchased Template --</option>
+                    {purchasedTemplates.map((t) => (
+                      <option key={t._id} value={t._id}>
+                        {t.title}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="text-red-500 text-sm">
+                    You&apos;ve not bought any template, kindly visit the template market to buy now.
+                  </p>
+                ))}
+
+              {/* Dynamic Fields */}
+              {Object.keys(fields).map((f) => (
+                <div key={f}>
+                  <Label className="capitalize">{f}</Label>
+                  <Input
+                    value={fields[f]}
+                    onChange={(e) => handleFieldChange(f, e.target.value)}
+                  />
+                </div>
+              ))}
+
+              <Button onClick={handleCreate} disabled={creating}>
+                {creating ? "Creating..." : "Create Document"}
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
